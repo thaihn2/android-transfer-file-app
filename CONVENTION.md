@@ -17,4 +17,4 @@
 - Chỉ xử lý các issue được gán cho mình.
 - Sau khi xử lý xong thì gán label phù hợp và assign lại cho người có trách nhiệm tiếp theo.
 - Có các label để phân loại issue cơ bản là `bug`, `feature`.
-- Các label trạng thái của issue là `feedback`, `solved`.
+- Các label trạng thái của issue là `feedback`, `solved`, `critical`.
