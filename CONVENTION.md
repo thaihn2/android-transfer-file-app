@@ -14,6 +14,7 @@
  + Tạo tag tại thời điểm release, đặt tên theo version (v1.0, v2.1.1...).
 
 # Làm việc với `Issues`:
+- Các issue được post bắt buộc phải gắn với 1 phiên bản cụ thể.
 - Chỉ xử lý các issue được gán cho mình.
 - Sau khi xử lý xong thì gán label phù hợp và assign lại cho người có trách nhiệm tiếp theo.
 - Có các label để phân loại issue cơ bản là `bug`, `feature`.
