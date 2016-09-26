@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.net.ServerSocket;
+
 import code.android.ngocthai.filechooser.FileChoose.Utils.FileUtils;
 import code.android.ngocthai.transferfile.Common.Support.MySocket;
 import code.android.ngocthai.transferfile.Common.Utils.FileTransfer;
@@ -32,6 +34,7 @@ public class ClientSendFileActivity extends AppCompatActivity {
     private String file_path;
     private String file_name;
     private FloatingActionButton fab;
+    private ServerSocket serverSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +50,8 @@ public class ClientSendFileActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //---Choose file button---
         btn_choose = (Button) findViewById(R.id.btn_choose_file);
-
         btn_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,16 +90,17 @@ public class ClientSendFileActivity extends AppCompatActivity {
             }
         });
 
+        //---button send file---
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (getFile_path().isEmpty()) {
-                    Snackbar.make(view, "File Path is null", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(view, "No file selected", Snackbar.LENGTH_SHORT).show();
                 } else {
                     //---send file in here---
                     TCPClient.ClientSendFile clientSendFile = new TCPClient.ClientSendFile(getFile_path(), getData(), ClientSendFileActivity.this, ValuesConst.PORT_SEND_FILE);
-                    clientSendFile.start();
+                    clientSendFile.execute();
                 }
             }
         });
@@ -130,6 +134,13 @@ public class ClientSendFileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Receive result when choose file in storage and sdcard
+     *
+     * @param requestCode code request when choose
+     * @param resultCode  code result of choose file
+     * @param data        data is kind of URI
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -146,7 +157,6 @@ public class ClientSendFileActivity extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
-
     }
 
     /**
@@ -166,11 +176,4 @@ public class ClientSendFileActivity extends AppCompatActivity {
         this.file_path = file_path;
     }
 
-    public String getFile_name() {
-        return file_name;
-    }
-
-    public void setFile_name(String file_name) {
-        this.file_name = file_name;
-    }
 }

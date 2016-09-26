@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import code.android.ngocthai.transferfile.Common.Support.MySocket;
+import code.android.ngocthai.transferfile.Common.Utils.Connect;
 import code.android.ngocthai.transferfile.Common.Utils.TCPClient;
 import code.android.ngocthai.transferfile.Common.Utils.ValuesConst;
 import code.android.ngocthai.transferfile.R;
@@ -37,7 +38,7 @@ public class ClientConnectActivity extends AppCompatActivity {
                 if (ip.isEmpty()) {
                     Toast.makeText(ClientConnectActivity.this, "IP is null", Toast.LENGTH_SHORT).show();
                 } else {
-                    TCPClient.ClientConnect clientConnect = new TCPClient.ClientConnect(ip, MySocket.getMyIpAddress(), ValuesConst.PORT_CONNECT, ClientConnectActivity.this);
+                    Connect.ClientConnect clientConnect = new Connect.ClientConnect(ip, MySocket.getMyIpAddress(), ValuesConst.PORT_CONNECT, ClientConnectActivity.this);
                     clientConnect.execute();
                 }
             }

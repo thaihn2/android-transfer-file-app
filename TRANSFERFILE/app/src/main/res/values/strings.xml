@@ -6,5 +6,6 @@
     <string name="title_activity_client_connect">ClientConnectActivity</string>
 
     <string name="chooser_title">Lorem ipsum</string>
+    <string name="dialog_sending">Sending....</string>
 
 </resources>

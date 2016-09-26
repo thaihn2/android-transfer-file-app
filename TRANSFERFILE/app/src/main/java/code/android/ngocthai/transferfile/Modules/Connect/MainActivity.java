@@ -14,6 +14,7 @@ import android.widget.TextView;
 import java.net.ServerSocket;
 
 import code.android.ngocthai.transferfile.Common.Support.MySocket;
+import code.android.ngocthai.transferfile.Common.Utils.Connect;
 import code.android.ngocthai.transferfile.Common.Utils.TCPServer;
 import code.android.ngocthai.transferfile.R;
 
@@ -62,8 +63,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        TCPServer.ServerConnect serverConnect = new TCPServer.ServerConnect(serverSocket, MainActivity.this);
-        serverConnect.start();
+        if (serverSocket == null) {
+            //---start server to listen client---
+            Connect.ServerConnect serverConnect = new Connect.ServerConnect(serverSocket, MainActivity.this);
+            serverConnect.start();
+        }
     }
 
     @Override

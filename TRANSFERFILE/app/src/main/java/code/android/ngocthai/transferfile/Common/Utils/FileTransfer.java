@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,28 +26,6 @@ import code.android.ngocthai.transferfile.R;
  * Created by Thaihn on 23/09/2016.
  */
 public class FileTransfer {
-
-//    public String getFileName(Uri uri) {
-//        String result = null;
-//        if (uri.getScheme().equals("content")) {
-////            Cursor cursor = .query(uri, null, null, null, null);
-//            try {
-//                if (cursor != null && cursor.moveToFirst()) {
-//                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-//                }
-//            } finally {
-//                cursor.close();
-//            }
-//        }
-//        if (result == null) {
-//            result = uri.getPath();
-//            int cut = result.lastIndexOf('/');
-//            if (cut != -1) {
-//                result = result.substring(cut + 1);
-//            }
-//        }
-//        return result;
-//    }
 
     /**
      * Show choose file and return is URI of FIle
@@ -75,11 +54,12 @@ public class FileTransfer {
      * @throws ClassNotFoundException
      */
     public static void SendFile(String file_path, Socket socket, final Activity activity) throws IOException, ClassNotFoundException {
+        //---create with real file path and get all information of file---
         File file = new File(file_path);
         String file_name = file.getName();
         byte[] buf = new byte[1024];
 
-        //---send file name to server---
+        //---send file name to server and pass to check---
         ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
         oos.flush();
         oos.writeObject(ValuesConst.pass_transfer + "," + file_name);
@@ -95,38 +75,36 @@ public class FileTransfer {
             bos.write(buf, 0, i);
             bos.flush();
         }
-
-        //---receive response of server---
-        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-        final String msg = (String) ois.readObject();
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(activity, "" + msg, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        //---important---
-//        socket.shutdownOutput();
-        fis.close();
-        bos.close();
     }
 
-    public static void ReceiveFile(Socket socket, final Activity activity) throws IOException, ClassNotFoundException {
+    /**
+     * Receive file from client
+     *
+     * @param socket   socket send file
+     * @param activity activity called this function
+     * @return file name and result write file
+     * @throws IOException            error if IO Exception
+     * @throws ClassNotFoundException error not found class
+     */
+    public static String ReceiveFile(Socket socket, final Activity activity) throws IOException, ClassNotFoundException {
 
         byte[] b = new byte[1024];
         int length = 0;
+        String result = "";
+        String file_name = "";
         int byte_count = 1024;
-
+        //---receive msg fom client---
         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
         String msg = (String) ois.readObject();
         if (!msg.isEmpty()) {
             String[] temp = msg.split(",");
+            file_name = temp[1];
             if (temp[0].equalsIgnoreCase(ValuesConst.pass_transfer)) {
                 //---true pass of app---
                 if (!temp[1].isEmpty()) {
                     //---create a new file---
                     File file = new File(Environment.getExternalStorageDirectory() + "/" + temp[1]);
+
                     //---receive file and write file---
                     FileOutputStream fos = new FileOutputStream(file);
                     InputStream is = socket.getInputStream();
@@ -135,36 +113,20 @@ public class FileTransfer {
                         byte_count += 1024;
                         fos.write(b, 0, length);
                     }
-                    final String file_name = temp[1];
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "Received " + file_name, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                    oos.writeObject(ValuesConst.status_success);
+                    result = "true";
                 } else {
                     //---file name is null. can't create file
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "Can't read file", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                    oos.writeObject(ValuesConst.status_error);
+                    result = "false";
                 }
             } else {
-                //---wrong pass---
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                oos.writeObject(ValuesConst.status_error);
+                //---wrong pass word---
+                result = "false";
             }
         } else {
             //---msg is null---
+            result = "false";
         }
-
-
+        return result + "," + file_name;
     }
 
 }
