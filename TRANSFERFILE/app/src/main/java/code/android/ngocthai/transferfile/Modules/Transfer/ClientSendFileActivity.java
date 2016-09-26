@@ -95,8 +95,7 @@ public class ClientSendFileActivity extends AppCompatActivity {
                     Snackbar.make(view, "File Path is null", Snackbar.LENGTH_SHORT).show();
                 } else {
                     //---send file in here---
-                    TCPClient.ClientSendFile clientSendFile = new TCPClient.ClientSendFile(ValuesConst.pass_transfer + "," +
-                            getFile_name(), getFile_path(), getData(), ClientSendFileActivity.this, ValuesConst.PORT_SEND_FILE);
+                    TCPClient.ClientSendFile clientSendFile = new TCPClient.ClientSendFile(getFile_path(), getData(), ClientSendFileActivity.this, ValuesConst.PORT_SEND_FILE);
                     clientSendFile.start();
                 }
             }
