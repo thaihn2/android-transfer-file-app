@@ -1,4 +1,4 @@
-package code.android.ngocthai.transferfile.Common.Utils;
+package code.android.ngocthai.transferfile.Modules.Connect;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import code.android.ngocthai.transferfile.Common.Support.MySocket;
+import code.android.ngocthai.transferfile.Common.Utils.ValuesConst;
 import code.android.ngocthai.transferfile.Modules.Transfer.ClientSendFileActivity;
 import code.android.ngocthai.transferfile.Modules.Transfer.ServerReceiveFileActivity;
 
@@ -160,9 +161,6 @@ public class Connect {
                             if (!ip.isEmpty()) {
                                 dataOutputStream.writeUTF(ValuesConst.status_success);
                                 //---close socket and data---
-                                MySocket.closeDataOutput(dataOutputStream);
-                                MySocket.closeSocket(socket);
-                                MySocket.closeDataInput(dataInputStream);
                                 activity.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -171,6 +169,9 @@ public class Connect {
                                         activity.startActivity(i);
                                     }
                                 });
+                                MySocket.closeDataOutput(dataOutputStream);
+                                MySocket.closeSocket(socket);
+                                MySocket.closeDataInput(dataInputStream);
                             }
                         }
                     }
