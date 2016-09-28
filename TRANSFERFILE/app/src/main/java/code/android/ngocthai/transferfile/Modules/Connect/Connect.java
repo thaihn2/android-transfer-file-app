@@ -30,7 +30,6 @@ public class Connect {
         private String ip_address_server;
         private String response_from_server = "";
         private String my_ip_address;
-        private String msg_to_server = ValuesConst.pass_transfer + "," + my_ip_address;
         private int port;
         private Activity activity;
 
@@ -60,21 +59,25 @@ public class Connect {
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
+                String msg_to_server = ValuesConst.pass_transfer + "," + my_ip_address;
+
                 if (!msg_to_server.isEmpty()) {
                     //---write message to server---
-                    dataOutputStream.writeUTF(msg_to_server);
+                    dataOutputStream.writeUTF(
+                            msg_to_server);
                 }
                 //---receive msg from server---
                 response_from_server = dataInputStream.readUTF();
 
             } catch (IOException e) {
                 e.printStackTrace();
-                response_from_server = "IOException : " + e.toString();
+                response_from_server = "IOException";
+                Toast.makeText(activity, "Partner is not running app", Toast.LENGTH_SHORT).show();
             } finally {
                 //---close connect---
-                MySocket.closeSocket(socket);
-                MySocket.closeDataInput(dataInputStream);
-                MySocket.closeDataOutput(dataOutputStream);
+//                MySocket.closeSocket(socket);
+//                MySocket.closeDataInput(dataInputStream);
+//                MySocket.closeDataOutput(dataOutputStream);
             }
             return null;
         }
@@ -82,30 +85,18 @@ public class Connect {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (response_from_server.equalsIgnoreCase(ValuesConst.status_success)) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(activity, "" + response_from_server, Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(activity, ClientSendFileActivity.class);
-                        intent.putExtra(ValuesConst.key_send_ip_client, ip_address_server);
-                        activity.startActivity(intent);
-                    }
-                });
-            } else if (response_from_server.equalsIgnoreCase(ValuesConst.status_error)) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(activity, "error connect. please try again", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
+            if (response_from_server.equalsIgnoreCase("IOException")) {
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(activity, "" + response_from_server, Toast.LENGTH_SHORT).show();
                     }
                 });
+            } else if (response_from_server.equalsIgnoreCase(ValuesConst.status_success)) {
+                Toast.makeText(activity, response_from_server + "connect to " + ip_address_server, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(activity, ClientSendFileActivity.class);
+                intent.putExtra(ValuesConst.key_send_ip_client, ip_address_server);
+                activity.startActivity(intent);
             }
         }
     }
@@ -149,40 +140,31 @@ public class Connect {
                     //---if message from client is null program is break---
                     msg_from_client = dataInputStream.readUTF();
 
-                    if (msg_from_client.equalsIgnoreCase("")) {
-                        //---no msg--
-                        dataOutputStream.writeUTF(ValuesConst.status_error);
-                    } else {
-                        String[] temp = msg_from_client.split(",");
-                        String pass = temp[0];
-                        final String ip = temp[1];
-                        if (pass.equalsIgnoreCase(ValuesConst.pass_transfer)) {
-                            //---match pass---
-                            if (!ip.isEmpty()) {
-                                dataOutputStream.writeUTF(ValuesConst.status_success);
-                                //---close socket and data---
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(activity, "Connected with " + ip, Toast.LENGTH_SHORT).show();
-                                        Intent i = new Intent(activity, ServerReceiveFileActivity.class);
-                                        activity.startActivity(i);
-                                    }
-                                });
-                                MySocket.closeDataOutput(dataOutputStream);
-                                MySocket.closeSocket(socket);
-                                MySocket.closeDataInput(dataInputStream);
+                    //---Split string from clietn sent---
+                    String[] temp = msg_from_client.split(",");
+                    String pass = temp[0];
+                    String[] a = temp[1].split(":");
+                    String address = a[1];
+                    String[] ip_space = address.split(" ");
+                    final String real_ip = ip_space[1];
+                    if (pass.equalsIgnoreCase(ValuesConst.pass_transfer)) {
+                        //---match pass---
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "Connected with " + real_ip, Toast.LENGTH_SHORT).show();
+                                Intent i = new Intent(activity, ServerReceiveFileActivity.class);
+                                i.putExtra(ValuesConst.key_send_ip_server, real_ip);
+                                activity.startActivity(i);
                             }
-                        }
+                        });
+                        dataOutputStream.writeUTF(ValuesConst.status_success);
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                //---close connect with client---
-                MySocket.closeSocket(socket);
-                MySocket.closeDataOutput(dataOutputStream);
-                MySocket.closeDataInput(dataInputStream);
+
             }
         }
     }
