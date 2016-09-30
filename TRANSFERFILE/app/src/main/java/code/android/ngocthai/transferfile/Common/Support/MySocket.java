@@ -92,14 +92,14 @@ public class MySocket {
                 while (enumInetAddress.hasMoreElements()) {
                     InetAddress inetAddress = enumInetAddress.nextElement();
                     if (inetAddress.isSiteLocalAddress()) {
-                        ip += "SiteLocalAddress: " + inetAddress.getHostAddress() + "\n";
+                        ip += "SiteLocalAddress: " + inetAddress.getHostAddress();
                     }
                 }
             }
         } catch (SocketException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            ip += "Something Wrong! " + e.toString() + "\n";
+            ip += "Something Wrong! " + e.toString();
         }
         return ip;
     }
