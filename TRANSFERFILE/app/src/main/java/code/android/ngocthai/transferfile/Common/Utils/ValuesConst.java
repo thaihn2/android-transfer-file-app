@@ -13,10 +13,12 @@ public class ValuesConst {
 
     public static final int PORT_CONNECT = 1234;
 
-    public static final int PORT_RESPONSE_SERVER = 3456;
-    public static final int PORT_RESPONSE_CLIENT = 3457;
-    public static final int PORT_SEND_FILE_SERVER = 2323;
-    public static final int PORT_SEND_FILE_CLIENT = 2424;
+    public static final int PORT_SERVER_CLIENT = 6996;
+
+//    public static final int PORT_RESPONSE_SERVER = 3456;
+//    public static final int PORT_RESPONSE_CLIENT = 3457;
+//    public static final int PORT_SEND_FILE_SERVER = 2323;
+//    public static final int PORT_SEND_FILE_CLIENT = 2424;
 
     public static final String pass_transfer = "ngocthai96";
 
