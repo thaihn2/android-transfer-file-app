@@ -26,7 +26,6 @@ import code.android.ngocthai.transferfile.R;
 public class ServerReceiveFileActivity extends AppCompatActivity {
 
     private ServerSocket server_socket_file;
-    //    private ServerSocket server_socket_response;
     private Toolbar toolbar;
     private String ip_partner;
     private Button btn_choose;
@@ -38,8 +37,6 @@ public class ServerReceiveFileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_receive_file);
 
-        getIpPartner();
-        Toast.makeText(ServerReceiveFileActivity.this, "" + ip_partner , Toast.LENGTH_SHORT).show();
         initToolbar();
         initView();
 
@@ -101,8 +98,13 @@ public class ServerReceiveFileActivity extends AppCompatActivity {
                     Snackbar.make(view, "No file selected", Snackbar.LENGTH_SHORT).show();
                 } else {
                     //---send file in here---
-                    Transfer.ClientSendFile clientSendFile = new Transfer.ClientSendFile(getFile_path(), ip_partner, ServerReceiveFileActivity.this, 9696);
-                    clientSendFile.execute();
+                    if (ip_partner == null) {
+                        Toast.makeText(ServerReceiveFileActivity.this, "ip null", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ServerReceiveFileActivity.this, "ip not null : " + ip_partner, Toast.LENGTH_SHORT).show();
+                        Transfer.ClientSendFile clientSendFile = new Transfer.ClientSendFile(getFile_path(), ip_partner, ServerReceiveFileActivity.this, 9696);
+                        clientSendFile.execute();
+                    }
                 }
             }
         });
@@ -133,10 +135,12 @@ public class ServerReceiveFileActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (server_socket_file == null) {
-            Transfer.ServerReceiveFile serverReceiveFile = new Transfer.ServerReceiveFile(server_socket_file, this, 6969, ip_partner);
-            serverReceiveFile.start();
-        }
+        getIpPartner();
+        Toast.makeText(ServerReceiveFileActivity.this, "" + ip_partner, Toast.LENGTH_SHORT).show();
+//        if (server_socket_file == null) {
+//            Transfer.ServerReceiveFile serverReceiveFile = new Transfer.ServerReceiveFile(server_socket_file, this, 6969, ip_partner);
+//            serverReceiveFile.start();
+//        }
     }
 
 
@@ -170,14 +174,14 @@ public class ServerReceiveFileActivity extends AppCompatActivity {
         ip_partner = getIntent().getStringExtra(ValuesConst.key_send_ip_server);
     }
 
-    /**
-     * Close server socket when activity destroy
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        MySocket.closeServerSocket(server_socket_file);
-    }
+//    /**
+//     * Close server socket when activity destroy
+//     */
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        MySocket.closeServerSocket(server_socket_file);
+//    }
 
     public String getFile_path() {
         return file_path;
