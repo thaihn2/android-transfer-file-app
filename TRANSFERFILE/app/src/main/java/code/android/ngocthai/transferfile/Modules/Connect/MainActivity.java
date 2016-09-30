@@ -29,19 +29,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initToolbar();
         initView();
     }
 
-    private void initView() {
+    private void initToolbar() {
         //---toolbar---
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
 
+    private void initView() {
         //---find view by id---
         txt_ip = (TextView) findViewById(R.id.txt_id_main);
         txt_ip.setText(MySocket.getMyIpAddress());
-        //---fab---
         fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        //---create thread listen from client---
+        Connect.ServerConnect serverConnect = new Connect.ServerConnect(serverSocket, MainActivity.this);
+        serverConnect.start();
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (serverSocket == null) {
-            //---start server to listen client---
             Connect.ServerConnect serverConnect = new Connect.ServerConnect(serverSocket, MainActivity.this);
             serverConnect.start();
         }

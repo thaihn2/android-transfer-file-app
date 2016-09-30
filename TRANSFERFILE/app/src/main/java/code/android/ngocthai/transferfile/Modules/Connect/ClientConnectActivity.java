@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.Random;
+
 import code.android.ngocthai.transferfile.Common.Support.MySocket;
 import code.android.ngocthai.transferfile.Common.Utils.ValuesConst;
 import code.android.ngocthai.transferfile.R;

@@ -63,8 +63,7 @@ public class Connect {
 
                 if (!msg_to_server.isEmpty()) {
                     //---write message to server---
-                    dataOutputStream.writeUTF(
-                            msg_to_server);
+                    dataOutputStream.writeUTF(msg_to_server);
                 }
                 //---receive msg from server---
                 response_from_server = dataInputStream.readUTF();
@@ -140,25 +139,30 @@ public class Connect {
                     //---if message from client is null program is break---
                     msg_from_client = dataInputStream.readUTF();
 
-                    //---Split string from clietn sent---
-                    String[] temp = msg_from_client.split(",");
-                    String pass = temp[0];
-                    String[] a = temp[1].split(":");
-                    String address = a[1];
-                    String[] ip_space = address.split(" ");
-                    final String real_ip = ip_space[1];
-                    if (pass.equalsIgnoreCase(ValuesConst.pass_transfer)) {
-                        //---match pass---
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(activity, "Connected with " + real_ip, Toast.LENGTH_SHORT).show();
-                                Intent i = new Intent(activity, ServerReceiveFileActivity.class);
-                                i.putExtra(ValuesConst.key_send_ip_server, real_ip);
-                                activity.startActivity(i);
+                    if (!msg_from_client.equalsIgnoreCase("")) {
+                        String[] temp = msg_from_client.split(",");
+                        String pass = temp[0];
+                        String[] a = temp[1].split(":");
+                        String address = a[1];
+                        String[] ip_space = address.split(" ");
+                        final String real_ip = ip_space[1];
+                        if (pass.equalsIgnoreCase(ValuesConst.pass_transfer)) {
+                            //---true pass of app---
+                            if (!real_ip.isEmpty()) {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(activity, "Connected with " + real_ip, Toast.LENGTH_SHORT).show();
+                                        Intent i = new Intent(activity, ServerReceiveFileActivity.class);
+                                        i.putExtra(ValuesConst.key_send_ip_server, real_ip);
+                                        activity.startActivity(i);
+                                    }
+                                });
+                                dataOutputStream.writeUTF(ValuesConst.status_success);
+                            } else {
+                                dataOutputStream.writeUTF(ValuesConst.status_error);
                             }
-                        });
-                        dataOutputStream.writeUTF(ValuesConst.status_success);
+                        }
                     }
                 }
             } catch (IOException e) {

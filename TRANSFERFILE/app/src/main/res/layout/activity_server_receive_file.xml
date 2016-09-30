@@ -21,7 +21,21 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_server_receive_file" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <Button
+            android:id="@+id/btn_choose_file_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="CHOOSE FILE"
+            android:textColor="#cc0808"
+            android:textSize="25sp" />
+
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_receive_file"

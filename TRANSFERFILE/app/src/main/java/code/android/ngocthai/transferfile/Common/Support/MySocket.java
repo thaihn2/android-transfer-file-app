@@ -91,16 +91,11 @@ public class MySocket {
                         .getInetAddresses();
                 while (enumInetAddress.hasMoreElements()) {
                     InetAddress inetAddress = enumInetAddress.nextElement();
-
                     if (inetAddress.isSiteLocalAddress()) {
-                        ip += "SiteLocalAddress: "
-                                + inetAddress.getHostAddress() + "\n";
+                        ip += "SiteLocalAddress: " + inetAddress.getHostAddress() + "\n";
                     }
-
                 }
-
             }
-
         } catch (SocketException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

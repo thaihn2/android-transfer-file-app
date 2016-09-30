@@ -1,4 +1,4 @@
-package code.android.ngocthai.transferfile.Common.Utils;
+package code.android.ngocthai.transferfile.Modules.Transfer;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -12,11 +12,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import code.android.ngocthai.transferfile.Common.Support.MySocket;
+import code.android.ngocthai.transferfile.Common.Utils.ValuesConst;
 
 /**
  * Created by Thaihn on 26/09/2016.
  */
 public class Response {
+
+
 
     /**
      * Client connect to server
@@ -69,10 +72,11 @@ public class Response {
     /**
      * Class connect server with client using thread and always listen from client.
      */
-    public static class ServerConnect extends Thread {
+    public static class ServerResponse extends Thread {
 
         private ServerSocket serverSocket;
         private Activity activity;
+        private int port;
 
         /**
          * Constructor default to add values
@@ -80,9 +84,10 @@ public class Response {
          * @param serverSocket
          * @param activity
          */
-        public ServerConnect(ServerSocket serverSocket, Activity activity) {
+        public ServerResponse(ServerSocket serverSocket, Activity activity, int port) {
             this.serverSocket = serverSocket;
             this.activity = activity;
+            this.port = port;
         }
 
         @Override
@@ -95,7 +100,7 @@ public class Response {
                 //---create server socket to listen from server---
                 serverSocket = new ServerSocket();
                 serverSocket.setReuseAddress(true);
-                serverSocket.bind(new InetSocketAddress(ValuesConst.PORT_CONNECT));
+                serverSocket.bind(new InetSocketAddress(port));
 
                 while (true) {
                     socket = serverSocket.accept();
@@ -107,12 +112,7 @@ public class Response {
 
                     if (msg_from_client.equalsIgnoreCase("")) {
                         //---no msg--
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(activity, "No message from server", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+
                     } else {
                         String[] temp = msg_from_client.split(",");
                         String pass = temp[0];
@@ -123,7 +123,7 @@ public class Response {
                                 activity.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toast.makeText(activity, "" + result, Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(activity, "Transfer " + result, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }

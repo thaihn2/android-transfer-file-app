@@ -7,5 +7,6 @@
 
     <string name="chooser_title">Lorem ipsum</string>
     <string name="dialog_sending">Sending....</string>
+    <string name="toolbar_transfer_file">FILE TRANSFER LAN</string>
 
 </resources>

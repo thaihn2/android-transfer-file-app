@@ -1,18 +1,14 @@
 package code.android.ngocthai.transferfile.Modules.Transfer;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -22,9 +18,9 @@ import java.net.ServerSocket;
 import code.android.ngocthai.filechooser.FileChoose.Utils.FileUtils;
 import code.android.ngocthai.transferfile.Common.Support.MySocket;
 import code.android.ngocthai.transferfile.Common.Utils.FileTransfer;
-import code.android.ngocthai.transferfile.Common.Utils.TCPClient;
+import code.android.ngocthai.transferfile.Common.Utils.Transfer;
 import code.android.ngocthai.transferfile.Common.Utils.ValuesConst;
-import code.android.ngocthai.transferfile.Modules.Connect.ClientConnectActivity;
+import code.android.ngocthai.transferfile.Modules.Connect.MainActivity;
 import code.android.ngocthai.transferfile.R;
 
 public class ClientSendFileActivity extends AppCompatActivity {
@@ -32,66 +28,65 @@ public class ClientSendFileActivity extends AppCompatActivity {
     private Button btn_choose;
     private Toolbar toolbar;
     private String file_path;
-    private String file_name;
+//    private ServerSocket server_socket_response;
+    private ServerSocket server_socket_file;
+    private String ip_partner;
     private FloatingActionButton fab;
-    private ServerSocket serverSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_send_file);
 
+        getIpPartner();
+        initToolbar();
         initView();
 
     }
 
-    private void initView() {
+    /**
+     * Support actionbar with toolbar
+     */
+    private void initToolbar() {
         //---toolbar---
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("FILE TRANSFER LAN");
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home: {
+                Intent i = new Intent(this, MainActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initView() {
+
 
         //---Choose file button---
-        btn_choose = (Button) findViewById(R.id.btn_choose_file);
+        btn_choose = (Button) findViewById(R.id.btn_choose_file_client);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        Transfer.ServerReceiveFile serverReceiveFile = new Transfer.ServerReceiveFile(server_socket_file, this,9696, ip_partner);
+        serverReceiveFile.start();
+
         btn_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //---Check request permission with android 6.0+---
-                if (ContextCompat.checkSelfPermission(ClientSendFileActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-                    // Should we show an explanation?
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(ClientSendFileActivity.this,
-                            Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
-                        // Show an expanation to the user *asynchronously* -- don't block
-                        // this thread waiting for the user's response! After the user
-                        // sees the explanation, try again to request the permission.
-
-                        FileTransfer.showChooser(ClientSendFileActivity.this);
-
-                    } else {
-
-                        // No explanation needed, we can request the permission.
-
-                        FileTransfer.showChooser(ClientSendFileActivity.this);
-
-                        ActivityCompat.requestPermissions(ClientSendFileActivity.this,
-                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                ValuesConst.REQUEST_CODE_PERMISSION);
-                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                        // app-defined int constant. The callback method gets the
-                        // result of the request.
-                    }
-                } else {
-                    FileTransfer.showChooser(ClientSendFileActivity.this);
-                }
+                //---check permission of android 6.0 +
+                ValuesConst.checkPermissionAndroidSixPlus(ClientSendFileActivity.this, ValuesConst.REQUEST_CODE_PERMISSION_CLIENT, ValuesConst.REQUEST_CODE_CHOOSE_FILE_CLIENT);
             }
         });
 
         //---button send file---
-        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,7 +94,7 @@ public class ClientSendFileActivity extends AppCompatActivity {
                     Snackbar.make(view, "No file selected", Snackbar.LENGTH_SHORT).show();
                 } else {
                     //---send file in here---
-                    TCPClient.ClientSendFile clientSendFile = new TCPClient.ClientSendFile(getFile_path(), getData(), ClientSendFileActivity.this, ValuesConst.PORT_SEND_FILE);
+                    Transfer.ClientSendFile clientSendFile = new Transfer.ClientSendFile(getFile_path(), ip_partner, ClientSendFileActivity.this, 6969);
                     clientSendFile.execute();
                 }
             }
@@ -111,27 +106,39 @@ public class ClientSendFileActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case ValuesConst.REQUEST_CODE_PERMISSION: {
+            case ValuesConst.REQUEST_CODE_PERMISSION_CLIENT: {
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    FileTransfer.showChooser(ClientSendFileActivity.this);
-
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    FileTransfer.showChooser(ClientSendFileActivity.this, ValuesConst.REQUEST_CODE_CHOOSE_FILE_CLIENT);
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-
                 } else {
-
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
                 return;
             }
-
             // other 'case' lines to check for other
             // permissions this app might request
         }
+    }
+
+    /**
+     * Called when activity start and resume
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(server_socket_file == null) {
+            Transfer.ServerReceiveFile serverReceiveFile = new Transfer.ServerReceiveFile(server_socket_file, this, 9696, ip_partner);
+            serverReceiveFile.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MySocket.closeServerSocket(server_socket_file);
     }
 
     /**
@@ -144,14 +151,12 @@ public class ClientSendFileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case ValuesConst.REQUEST_CODE_CHOOSE_FILE: {
+            case ValuesConst.REQUEST_CODE_CHOOSE_FILE_CLIENT: {
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null) {
-                        Uri uri = data.getData();
-                        Log.i("Uri Receive", "onActivityResult: " + uri.toString());
-                        final String path = FileUtils.getPath(ClientSendFileActivity.this, uri);
-                        setFile_path(path);
-                        Toast.makeText(ClientSendFileActivity.this, "File Selected : " + getFile_path(), Toast.LENGTH_SHORT).show();
+                        //---result of data is Uri---
+                        setFile_path(FileUtils.getPath(ClientSendFileActivity.this, data.getData()));
+                        Toast.makeText(ClientSendFileActivity.this, "" + getFile_path(), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -160,12 +165,12 @@ public class ClientSendFileActivity extends AppCompatActivity {
     }
 
     /**
-     * Get key from Client connect
+     * Get ip of partner from client connect activity sent
      *
      * @return string ip of server connect to
      */
-    private String getData() {
-        return getIntent().getStringExtra(ValuesConst.key_send_ip_client);
+    private void getIpPartner() {
+        ip_partner = getIntent().getStringExtra(ValuesConst.key_send_ip_client);
     }
 
     public String getFile_path() {
