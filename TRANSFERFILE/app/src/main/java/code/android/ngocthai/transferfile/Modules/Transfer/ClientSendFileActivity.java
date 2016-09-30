@@ -28,7 +28,6 @@ public class ClientSendFileActivity extends AppCompatActivity {
     private Button btn_choose;
     private Toolbar toolbar;
     private String file_path;
-//    private ServerSocket server_socket_response;
     private ServerSocket server_socket_file;
     private String ip_partner;
     private FloatingActionButton fab;
@@ -38,7 +37,6 @@ public class ClientSendFileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_send_file);
 
-        getIpPartner();
         initToolbar();
         initView();
 
@@ -123,23 +121,26 @@ public class ClientSendFileActivity extends AppCompatActivity {
         }
     }
 
+
+
     /**
      * Called when activity start and resume
      */
     @Override
     protected void onStart() {
         super.onStart();
-        if(server_socket_file == null) {
-            Transfer.ServerReceiveFile serverReceiveFile = new Transfer.ServerReceiveFile(server_socket_file, this, 9696, ip_partner);
-            serverReceiveFile.start();
-        }
+        ip_partner = getIntent().getStringExtra(ValuesConst.key_send_ip_client);
+//        if(server_socket_file == null) {
+//            Transfer.ServerReceiveFile serverReceiveFile = new Transfer.ServerReceiveFile(server_socket_file, this, 9696, ip_partner);
+//            serverReceiveFile.start();
+//        }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        MySocket.closeServerSocket(server_socket_file);
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        MySocket.closeServerSocket(server_socket_file);
+//    }
 
     /**
      * Receive result when choose file in storage and sdcard
@@ -164,14 +165,14 @@ public class ClientSendFileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /**
-     * Get ip of partner from client connect activity sent
-     *
-     * @return string ip of server connect to
-     */
-    private void getIpPartner() {
-        ip_partner = getIntent().getStringExtra(ValuesConst.key_send_ip_client);
-    }
+//    /**
+//     * Get ip of partner from client connect activity sent
+//     *
+//     * @return string ip of server connect to
+//     */
+//    private void getIpPartner() {
+//
+//    }
 
     public String getFile_path() {
         return file_path;
