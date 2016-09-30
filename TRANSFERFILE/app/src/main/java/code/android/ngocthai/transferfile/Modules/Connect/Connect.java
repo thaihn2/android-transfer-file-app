@@ -73,10 +73,6 @@ public class Connect {
                 response_from_server = "IOException";
                 Toast.makeText(activity, "Partner is not running app", Toast.LENGTH_SHORT).show();
             } finally {
-                //---close connect---
-//                MySocket.closeSocket(socket);
-//                MySocket.closeDataInput(dataInputStream);
-//                MySocket.closeDataOutput(dataOutputStream);
             }
             return null;
         }
